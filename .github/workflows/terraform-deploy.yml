@@ -50,28 +50,6 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
 
-      # TEMPORARY DIAGNOSTIC — section 4.4. Remove this step once the
-      # output has been captured.
-      #
-      # The OIDC token is a JWT and its middle segment is readable. This
-      # prints the claims GitHub actually mints for this job, which is the
-      # only reliable way to establish what the trust policy's sub
-      # condition has to match. GitHub's published documentation shows a
-      # different form for this claim that never matches, and a condition
-      # written from the docs fails with a generic "not authorized" that
-      # names no claim at all.
-      #
-      # It sits before the assume-role step deliberately: it captures what
-      # GitHub sent regardless of whether AWS later accepts it, which is
-      # what makes it useful as a diagnostic rather than a confirmation.
-      - name: Print the OIDC token's claims
-        run: |
-          TOKEN=$(curl -sS \
-            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com" \
-            | jq -r .value)
-          echo "$TOKEN" | cut -d. -f2 | tr '_-' '/+' | base64 -d | jq .
-
       # The sub claim this role's trust policy matches on is NOT the form
       # the documentation shows. GitHub sends the owner and repository
       # names with their immutable numeric IDs appended:

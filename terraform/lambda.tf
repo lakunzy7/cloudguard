@@ -56,8 +56,8 @@ resource "aws_s3_bucket_notification" "uploads_trigger" {
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.process_upload.arn
-    events               = ["s3:ObjectCreated:*"]
-    filter_prefix        = "incoming/"
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "incoming/"
   }
 
   depends_on = [aws_lambda_permission.allow_s3_invoke]

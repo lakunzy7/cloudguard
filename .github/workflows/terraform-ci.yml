@@ -25,9 +25,8 @@ jobs:
       - name: Terraform validate
         run: terraform -chdir=terraform validate
 
-  # Every stage below this line is a deliberate placeholder, the same
-  # pattern DocuTrust's baseline pipeline used. Chain A adds IAM
-  # right-sizing checks, Chain B adds Cloud Custodian policy gates and
+  # Every stage below this line is a deliberate placeholder. Chain A adds
+  # IAM right-sizing checks, Chain B adds Cloud Custodian policy gates and
   # drift detection, Chain C adds automated compliance scanning against
   # this exact config. Wiring any of it in here would pre-solve that
   # chain's work.

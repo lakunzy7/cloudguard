@@ -5,3 +5,13 @@
 terraform/build/
 crash.log
 *.zip
+*.CLAUDE.md
+CLAUDE.md
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+graft/
+
+# Python bytecode. Compiling the broker to check its syntax is a local
+# step, not part of the deliverable.
+__pycache__/
+*.pyc

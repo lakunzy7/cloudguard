@@ -111,38 +111,34 @@ resource "aws_iam_role_policy_attachment" "lambda_process_upload_vpc_access" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
-# A second, deliberately standing-access role representing the kind of
-# permanent, broad human access Chain A, Project 2 (Just-in-Time Access)
-# should replace with a time-bound request flow. Nobody should actually
-# assume this role day to day, it exists to be measured against, and
-# eventually replaced by a request-based alternative in that project.
-resource "aws_iam_role" "standing_developer_access" {
-  name = "${var.environment_name}-standing-developer-access"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-        }
-        Action = "sts:AssumeRole"
-        Condition = {
-          # Requires MFA at minimum, even a deliberately over-broad
-          # example role should not skip this baseline control.
-          Bool = {
-            "aws:MultiFactorAuthPresent" = "true"
-          }
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "standing_developer_access_policy" {
-  role       = aws_iam_role.standing_developer_access.name
-  policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
-}
+# SEEDED FINDING for Chain A, Project 2 (Just-in-Time Access and Confused
+# Deputy Hardening), CLOSED by this project's own work.
+#
+# A standing role used to be declared here:
+#
+#   resource "aws_iam_role" "standing_developer_access"
+#
+# attached to PowerUserAccess, assumable by any principal in the account
+# that could present MFA, with no expiry, no justification and no request
+# step. It is gone, and it was removed rather than narrowed.
+#
+# Two findings decided that, and both are evidenced in the walkthrough:
+#
+#   - It had never been used. CloudTrail's event history contains no
+#     AssumeRole naming it, while the identical query returns assumptions
+#     for the role beside it; IAM's own last-used record held no date for
+#     it either. Two independent sources, each carrying its own control.
+#   - A time-bound alternative exists and was proven rather than
+#     described. The broker in terraform/jit.tf issued a real credential,
+#     a real API call succeeded with it, and the same call was refused
+#     once its window had passed.
+#
+# Narrowing it would have meant naming a break-glass principal that
+# nothing in this environment needs. An unused standing grant is not a
+# controlled permission; it is exposure with no return.
+#
+# Do not recreate it. The access it granted is available on request, with
+# a justification recorded and an expiry that has been demonstrated:
+# see terraform/jit.tf.
 
 data "aws_caller_identity" "current" {}

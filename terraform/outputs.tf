@@ -16,11 +16,6 @@ output "lambda_role_name" {
   description = "The over-permissioned role Project 1 right-sizes."
 }
 
-output "standing_developer_role_arn" {
-  value       = aws_iam_role.standing_developer_access.arn
-  description = "The standing-access role Project 2 replaces with a JIT flow."
-}
-
 output "kms_key_id" {
   value       = aws_kms_key.uploads_encryption.key_id
   description = "The key with the seeded overly-broad key policy for Project 6."
